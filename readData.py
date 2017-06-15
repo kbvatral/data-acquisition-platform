@@ -33,10 +33,9 @@ while True:
         # Read the specified ADC channel using the previously set gain value.
         values[i] = adc.read_adc(i, gain=GAIN)
 
-    with open("data/dataLog.csv", "wb") as csv_file:
+    with open("data/dataLog.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
-        for val in values:
-            writer.writerow([values])
+        writer.writerow(values)
 
     # Pause for half a second.
     time.sleep(0.5)
