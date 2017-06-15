@@ -34,9 +34,9 @@ while True:
         values[i] = adc.read_adc(i, gain=GAIN)
 
     with open("data/dataLog.csv", "wb") as csv_file:
-        writer = csv.writer(csv_file, delimiter=',')
-        writer.writerow(values)
-
+        writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
+        for val in values:
+            writer.writerow([values])
 
     # Pause for half a second.
     time.sleep(0.5)
