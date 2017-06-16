@@ -4,6 +4,7 @@
 
 import time
 import csv
+import datetime
 # Import the ADS1x15 module.
 import Adafruit_ADS1x15
 
@@ -27,15 +28,37 @@ print('Reading ADS1x15 values, press Ctrl-C to quit...')
 # Main loop.
 while True:
     # Read all the ADC channel values in a list.
-    values = [0]*4 # Initialize 1x4 array of zeroes
+    valuesa0 = [0]*2  # Initialize 1x2 array of zeroes
+    valuesa1 = [0]*2
+    valuesa2 = [0]*2
+    valuesa3 = [0]*2
 
-    for i in range(4): # Loop through each of the channel of the ADC
-        # Read the specified ADC channel using the previously set gain value.
-        values[i] = adc.read_adc(i, gain=GAIN)
+    # Get the current datetime in a readable string: YYYY-MM-DD HH:mm:SS:ssssss
+    valuesa0[0] = str(datetime.datetime.now())
+    # Read the specified ADC channel using the previously set gain value
+    valuesa0[1] = str(adc.read_adc(0, gain=GAIN))
 
-    with open("data/dataLog.csv", "a") as csv_file:
+    valuesa1[0] = str(datetime.datetime.now())
+    valuesa1[1] = str(adc.read_adc(1, gain=GAIN))
+
+    valuesa2[0] = str(datetime.datetime.now())
+    valuesa2[1] = str(adc.read_adc(2, gain=GAIN))
+
+    valuesa3[0] = str(datetime.datetime.now())
+    valuesa3[1] = str(adc.read_adc(3, gain=GAIN))
+
+    with open("data/dataLog0.csv", "a") as csv_file:
         writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
-        writer.writerow(values)
+        writer.writerow(valuesa0)
+    with open("data/dataLog1.csv", "a") as csv_file:
+        writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
+        writer.writerow(valuesa1)
+    with open("data/dataLog2.csv", "a") as csv_file:
+        writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
+        writer.writerow(valuesa2)
+    with open("data/dataLog3.csv", "a") as csv_file:
+        writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
+        writer.writerow(valuesa3)
 
     # Pause for half a second.
     time.sleep(0.5)
