@@ -5,10 +5,12 @@
 import csv
 import time
 import datetime
+import threading
 import timeit  # For timing function
 from random import randint
 
 startTime = time.time()  # Get the time at the start of the program
+thread_counter = 0  # A counter to represent the thread ID on the data dumps
 
 
 # Function to initialize data files by the current datetime
@@ -24,8 +26,8 @@ def createFiles():
 
 
 # Function to read the data and save to the csv
-#   pinNumber - The pin off which to read the data
-#   now - The datetime when the save file was instantiated
+#       pinNumber - The pin off which to read the data
+#       now - The datetime when the save file was instantiated
 def readValue(pinNumber, now):
     data = [0]*2
     # Get the current datetime in a readable string: YYYY-MM-DD HH:mm:SS:ssssss
@@ -43,9 +45,29 @@ def readValue(pinNumber, now):
     return
 
 
+# Define the clss for multithreading data dumps
+class dataDump(threading.Thread):
+    def __init__(self, threadID, time_stamp):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.time_stamp = time_stamp
+
+    def run(self):
+        dataDump_function(self.time_stamp)
+
+
+# Function to do the actual data dump called by the dataDump thread class
+#       time_stamp - the time stamp of the file to be proccessed
+def dataDump_function(time_stamp):
+    # Put interesting things here later
+    print(time_stamp)
+
+
+# ========== Main Function ========== #
+
 now_time = createFiles()  # Initialize the first set of files and store time
-intervals = [1, 2, 1, 4]  # Internals before we get data again
-previousTime = [0]*4  # Last time data was taken
+intervals = [1, 2, 1, 4, 10]  # Internals (sec) before we get data again
+previousTime = [0]*5  # Last time data was taken
 
 # We run the function in an infinite loop to continually take data
 while True:
@@ -58,3 +80,10 @@ while True:
         if (currentTime - previousTime[i] > intervals[i]):
             previousTime[i] = round(time.time() - startTime, 2)
             readValue(i, now_time)
+
+# Check if we are ready for a data dump
+    if (currentTime - previousTime[4] > intervals[4]):
+        previousTime[4] = currentTime
+        thread_counter += 1
+        dataDump(thread_counter, now_time).start()
+        now_time = createFiles()
