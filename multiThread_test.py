@@ -64,6 +64,15 @@ def dataDump_function(time_stamp):
     cursor = mydb.cursor()
 
     for i in range(4):
+        # Determine the table by the pin number
+        if i == 0:
+            table = 'test_a0'
+        elif i == 1:
+            table = 'test_a1'
+        elif i == 2:
+            table = 'test_a2'
+        elif i == 3:
+            table = 'test_a3'
         # file is called based on pin number
         fileName = "data/a"+str(i)+"_"+str(time_stamp.year)+"-"+str(time_stamp.month)+"-"+str(time_stamp.day)+"_"+str(time_stamp.hour)+":"+str(time_stamp.minute)+":"+str(time_stamp.second)+".csv"
         # Open the file and write the data to the csv
@@ -73,7 +82,7 @@ def dataDump_function(time_stamp):
                 timeStamp = datetime.datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f')
                 date = timeStamp.date()
                 time = timeStamp.time()
-                cursor.execute('INSERT INTO test_sensor_data(platform_id, data_date, data_time, numeric_data ) VALUES(%s, %s, %s, %s)', (1, date, time, row[1]))
+                cursor.execute('INSERT INTO '+table+'(platform_id, data_date, data_time, numeric_data ) VALUES(%s, %s, %s, %s)', (1, date, time, row[1]))
 
     mydb.commit()
     cursor.close()
