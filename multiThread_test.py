@@ -8,6 +8,7 @@ import datetime
 import threading
 import timeit  # For timing function
 from random import randint
+import MySQLdb
 
 startTime = time.time()  # Get the time at the start of the program
 thread_counter = 0  # A counter to represent the thread ID on the data dumps
@@ -41,7 +42,7 @@ def readValue(pinNumber, now):
     with open(fileName, "a") as csv_file:
         writer = csv.writer(csv_file, delimiter=',', lineterminator='\n')
         writer.writerow(data)
-    print(str(data) + ": pin"+str(pinNumber))
+    # print(str(data) + ": pin"+str(pinNumber))
     return
 
 
@@ -59,8 +60,24 @@ class dataDump(threading.Thread):
 # Function to do the actual data dump called by the dataDump thread class
 #       time_stamp - the time stamp of the file to be proccessed
 def dataDump_function(time_stamp):
-    # Put interesting things here later
-    print(time_stamp)
+    mydb = MySQLdb.connect(host='10.128.189.163', user='root', passwd='ENCLions', db='sensor_test')
+    cursor = mydb.cursor()
+
+    for i in range(4):
+        # file is called based on pin number
+        fileName = "data/a"+str(i)+"_"+str(time_stamp.year)+"-"+str(time_stamp.month)+"-"+str(time_stamp.day)+"_"+str(time_stamp.hour)+":"+str(time_stamp.minute)+":"+str(time_stamp.second)+".csv"
+        # Open the file and write the data to the csv
+        with open(fileName) as csv_file:
+            reader = csv.reader(csv_file, delimiter=',', lineterminator='\n')
+            for row in reader:
+                timeStamp = datetime.datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f')
+                date = timeStamp.date()
+                time = timeStamp.time()
+                cursor.execute('INSERT INTO test_sensor_data(platform_id, data_date, data_time, numeric_data ) VALUES(%s, %s, %s, %s)', (1, date, time, row[1]))
+
+    mydb.commit()
+    cursor.close()
+    print("Done")
 
 
 # ========== Main Function ========== #
