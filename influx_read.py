@@ -11,14 +11,28 @@ import influxdb
 from influxdb import InfluxDBClient
 import os
 from delorean import Delorean
-
+# Import the ADS1x15 module.
+import Adafruit_ADS1x15
+# Supress ssl certificate warning
 import requests
-requests.packages.urllib3.disable_warnings()  # Supress ssl certificate warning
+requests.packages.urllib3.disable_warnings()
+
 
 startTime = time.time()  # Get the time at the start of the program
 thread_counter = 0  # A counter to represent the thread ID on the data dumps
 
+# Create an ADS1115 ADC (16-bit) instance.
+adc = Adafruit_ADS1x15.ADS1115()
+
 # Variable Declarations
+
+# A list of intervals over which data is taken
+intervals = [1, 2, 1, 4, 10]  # Internals (sec) before we get data again
+intervals.append(1)  # Time (in sec) between each pin 0 measurement
+intervals.append(2)  # Time (in sec) between each pin 1 measurement
+intervals.append(1)  # Time (in sec) between each pin 2 measurement
+intervals.append(4)  # Time (in sec) between each pin 3 measurement
+intervals.append(10)  # Time (in sec) between each data dump
 
 # Influxdb Connection
 host = '10.128.189.163'
@@ -32,11 +46,21 @@ client = InfluxDBClient(host, port, user, password, dbname, ssl)
 # A list of influxdb measurements. The indecies of the list correspond to the
 # pin number on the ADC
 measurements = []
-measurements.append('test_a0')
-measurements.append('test_a1')
-measurements.append('test_a2')
-measurements.append('test_a3')
+measurements.append('test_a0')  # Pin 0 measurement name
+measurements.append('test_a1')  # Pin 1 measurement name
+measurements.append('test_a2')  # Pin 2 measurement name
+measurements.append('test_a3')  # Pin 3 measurement name
 
+# Choose a gain of 1 for reading voltages from 0 to 4.09V.
+# Or pick a different gain to change the range of voltages that are read:
+#  - 2/3 = +/-6.144V
+#  -   1 = +/-4.096V
+#  -   2 = +/-2.048V
+#  -   4 = +/-1.024V
+#  -   8 = +/-0.512V
+#  -  16 = +/-0.256V
+# See table 3 in the ADS1015/ADS1115 datasheet for more info on gain.
+GAIN = 1
 
 # Function to initialize data files by the current datetime
 def createFiles():
@@ -58,7 +82,7 @@ def readValue(pinNumber, now):
     # Get the UTC time in nanoseconds since the epoch
     data[0] = str(int(Delorean().epoch * 1000000000))
     # Read the specified ADC channel using the previously set gain value
-    data[1] = str(randint(0, 32767))
+    data[1] = str(adc.read_adc(pinNumber, gain=GAIN))
 
     data_string = measurements[pinNumber] + ' ' + 'value=' + data[1] + ' ' + data[0] + '\n'
     # file is called based on pin number
@@ -112,7 +136,6 @@ def dataDump_function(time_stamp):
 # ========== Main Function ========== #
 
 now_time = createFiles()  # Initialize the first set of files and store time
-intervals = [1, 2, 1, 4, 10]  # Internals (sec) before we get data again
 previousTime = [0]*5  # Last time data was taken
 
 # We run the function in an infinite loop to continually take data
