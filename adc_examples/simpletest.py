@@ -36,8 +36,8 @@ print('-' * 37)
 # Main loop.
 while True:
     # Read all the ADC channel values in a list.
-    values = [0]*4
-    for i in range(4):
+    values = [0]*4 # Initialize 1x4 array of zeroes
+    for i in range(4): # Loop through each of the channel of the ADC
         # Read the specified ADC channel using the previously set gain value.
         values[i] = adc.read_adc(i, gain=GAIN)
         # Note you can also pass in an optional data_rate parameter that controls

@@ -112,7 +112,7 @@ def dataDump_function(time_stamp):
 # ========== Main Function ========== #
 
 now_time = createFiles()  # Initialize the first set of files and store time
-intervals = [1, 2, 1, 4, 10]  # Internals (sec) before we get data again
+intervals = [0.01, 2, 1, 4, 10]  # Internals (sec) before we get data again
 previousTime = [0]*5  # Last time data was taken
 
 # We run the function in an infinite loop to continually take data
@@ -124,7 +124,7 @@ while True:
     # take another measurement. If so, take one
     for i in range(4):
         if (currentTime - previousTime[i] > intervals[i]):
-            previousTime[i] = round(time.time() - startTime, 2)
+            previousTime[i] = round(time.time() - startTime, 3)
             readValue(i, now_time)
 
 # Check if we are ready for a data dump
