@@ -1,4 +1,4 @@
-# Script to simulate reading analog input from the ADS1x15 and save
+# Script to read analog input from the ADS1x15 and save
 # it to an influx database
 # Author: Caleb Vatral
 
