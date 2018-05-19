@@ -27,7 +27,7 @@ adc = Adafruit_ADS1x15.ADS1115()
 # Variable Declarations
 
 # A list of intervals over which data is taken
-intervals = [1, 2, 1, 4, 10]  # Internals (sec) before we get data again
+intervals = []  # Internals (sec) before we get data again
 intervals.append(1)  # Time (in sec) between each pin 0 measurement
 intervals.append(2)  # Time (in sec) between each pin 1 measurement
 intervals.append(1)  # Time (in sec) between each pin 2 measurement
