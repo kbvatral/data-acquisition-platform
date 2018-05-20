@@ -14,3 +14,6 @@ There are several facets of the data acquisition platform that require continued
 * Add code to process the ADC values and convert them to voltage
 * Refactor code to follow best practices for real-time capabilities
 * Attempt to connect multiple ADC units to have more sensors available on each platform
+* Run performance testing on platform and server
+* Convert script to systemd service (daemon)
+
